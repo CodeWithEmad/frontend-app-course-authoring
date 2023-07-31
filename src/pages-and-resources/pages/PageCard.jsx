@@ -32,7 +32,6 @@ const PageCard = ({
 }) => {
   const { path: pagesAndResourcesPath } = useContext(PagesAndResourcesContext);
   const isDesktop = useIsDesktop();
-
   // eslint-disable-next-line react/no-unstable-nested-components
   const SettingsButton = () => {
     if (page.legacyLink) {
