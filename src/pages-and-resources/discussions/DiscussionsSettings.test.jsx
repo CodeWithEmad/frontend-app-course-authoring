@@ -187,7 +187,7 @@ describe('DiscussionsSettings', () => {
       expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources`);
     });
 
-    test('successfully submit the modal', () => {
+    test('successfully submit the modal', async () => {
       setTimeout(() => {
         history.push(`/course/${courseId}/pages-and-resources/discussion`);
 
@@ -209,10 +209,10 @@ describe('DiscussionsSettings', () => {
         waitForElementToBeRemoved(queryByRole(container, 'button', { name: 'Close' }));
 
         waitFor(() => expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources`));
-      }, 4000);
+      }, 5000);
     });
 
-    test('requires confirmation if changing provider', () => {
+    test('requires confirmation if changing provider', async () => {
       setTimeout(() => {
         axiosMock.onGet(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${courseId}?username=abc123`).reply(200, courseDetailResponse);
         executeThunk(fetchCourseDetail(courseId), store.dispatch);
@@ -310,7 +310,7 @@ describe('DiscussionsSettings', () => {
       renderComponent();
     });
 
-    test('shows connection error alert at top of form', () => {
+    test('shows connection error alert at top of form', async () => {
       setTimeout(() => {
         history.push(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
 
@@ -330,7 +330,7 @@ describe('DiscussionsSettings', () => {
         expect(alert).toBeInTheDocument();
         expect(alert.textContent).toEqual(expect.stringContaining('We encountered a technical error when applying changes.'));
         expect(alert.innerHTML).toEqual(expect.stringContaining(getConfig().SUPPORT_URL));
-      }, 4000);
+      }, 5000);
     });
   });
 
@@ -365,7 +365,7 @@ describe('DiscussionsSettings', () => {
       renderComponent();
     });
 
-    test('shows permission denied alert at top of form', () => {
+    test('shows permission denied alert at top of form', async () => {
       setTimeout(() => {
         history.push(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
 
