@@ -9,6 +9,7 @@ import ProctoredExamSettings from './proctored-exam-settings/ProctoredExamSettin
 import EditorContainer from './editors/EditorContainer';
 import VideoSelectorContainer from './selectors/VideoSelectorContainer';
 import CustomPages from './custom-pages';
+import FilesAndUploads from './files-and-uploads';
 import { AdvancedSettings } from './advanced-settings';
 
 /**
@@ -45,10 +46,7 @@ const CourseAuthoringRoutes = ({ courseId }) => {
             )}
         </PageRoute>
         <PageRoute path={`${path}/assets`}>
-          {process.env.ENABLE_NEW_FILES_UPLOADS_PAGE === 'true'
-            && (
-              <Placeholder />
-            )}
+          <FilesAndUploads courseId={courseId} />
         </PageRoute>
         <PageRoute path={`${path}/videos`}>
           {process.env.ENABLE_NEW_VIDEO_UPLOAD_PAGE === 'true'
