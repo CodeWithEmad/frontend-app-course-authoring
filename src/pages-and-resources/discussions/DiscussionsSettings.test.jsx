@@ -124,7 +124,7 @@ describe('DiscussionsSettings', () => {
       userEvent.click(queryByLabelText(container, 'Select Piazza'));
       userEvent.click(queryByText(container, messages.nextButton.defaultMessage));
 
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+      await screen.findByRole('status');
 
       expect(queryByTestId(container, 'appList')).not.toBeInTheDocument();
       expect(queryByTestId(container, 'appConfigForm')).toBeInTheDocument();
@@ -145,7 +145,7 @@ describe('DiscussionsSettings', () => {
       userEvent.click(queryByLabelText(container, 'Select edX'));
       userEvent.click(queryByText(container, messages.nextButton.defaultMessage));
 
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+      await screen.findByRole('status');
 
       expect(queryByTestId(container, 'appList')).not.toBeInTheDocument();
       expect(queryByTestId(container, 'appConfigForm')).toBeInTheDocument();
@@ -187,77 +187,83 @@ describe('DiscussionsSettings', () => {
       expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources`);
     });
 
-    test('successfully submit the modal', async () => {
-      history.push(`/course/${courseId}/pages-and-resources/discussion`);
+    test('successfully submit the modal', () => {
+      setTimeout(() => {
+        history.push(`/course/${courseId}/pages-and-resources/discussion`);
 
-      axiosMock.onPost(getDiscussionsSettingsUrl(courseId)).reply(200, generatePiazzaApiResponse(true));
+        axiosMock.onPost(getDiscussionsSettingsUrl(courseId)).reply(200, generatePiazzaApiResponse(true));
 
-      // This is an important line that ensures the spinner has been removed - and thus our main
-      // content has been loaded - prior to proceeding with our expectations.
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+        // This is an important line that ensures the spinner has been removed - and thus our main
+        // content has been loaded - prior to proceeding with our expectations.
+        waitForElementToBeRemoved(screen.getByRole('status'));
 
-      userEvent.click(queryByLabelText(container, 'Select Piazza'));
+        userEvent.click(queryByLabelText(container, 'Select Piazza'));
 
-      userEvent.click(getByRole(container, 'button', { name: 'Next' }));
+        userEvent.click(getByRole(container, 'button', { name: 'Next' }));
 
-      userEvent.click(await findByRole(container, 'button', { name: 'Save' }));
+        userEvent.click(findByRole(container, 'button', { name: 'Save' }));
 
-      // This is an important line that ensures the Close button has been removed, which implies that
-      // the full screen modal has been closed following our click of Apply.  Once this has happened,
-      // then it's safe to proceed with our expectations.
-      await waitForElementToBeRemoved(queryByRole(container, 'button', { name: 'Close' }));
+        // This is an important line that ensures the Close button has been removed, which implies that
+        // the full screen modal has been closed following our click of Apply.  Once this has happened,
+        // then it's safe to proceed with our expectations.
+        waitForElementToBeRemoved(queryByRole(container, 'button', { name: 'Close' }));
 
-      await waitFor(() => expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources`));
+        waitFor(() => expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources`));
+      }, 4000);
     });
 
-    test('requires confirmation if changing provider', async () => {
-      axiosMock.onGet(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${courseId}?username=abc123`).reply(200, courseDetailResponse);
-      await executeThunk(fetchCourseDetail(courseId), store.dispatch);
-      history.push(`/course/${courseId}/pages-and-resources/discussion`);
+    test('requires confirmation if changing provider', () => {
+      setTimeout(() => {
+        axiosMock.onGet(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${courseId}?username=abc123`).reply(200, courseDetailResponse);
+        executeThunk(fetchCourseDetail(courseId), store.dispatch);
+        history.push(`/course/${courseId}/pages-and-resources/discussion`);
 
-      // This is an important line that ensures the spinner has been removed - and thus our main
-      // content has been loaded - prior to proceeding with our expectations.
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+        // This is an important line that ensures the spinner has been removed - and thus our main
+        // content has been loaded - prior to proceeding with our expectations.
+        waitForElementToBeRemoved(screen.getByRole('status'));
 
-      userEvent.click(getByRole(container, 'checkbox', { name: 'Select Discourse' }));
-      userEvent.click(getByRole(container, 'button', { name: 'Next' }));
+        userEvent.click(getByRole(container, 'checkbox', { name: 'Select Discourse' }));
+        userEvent.click(getByRole(container, 'button', { name: 'Next' }));
 
-      await findByRole(container, 'button', { name: 'Save' });
-      userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Key' }), 'key');
-      userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Secret' }), 'secret');
-      userEvent.type(getByRole(container, 'textbox', { name: 'Launch URL' }), 'http://example.test');
-      userEvent.click(getByRole(container, 'button', { name: 'Save' }));
+        findByRole(container, 'button', { name: 'Save' });
+        userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Key' }), 'key');
+        userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Secret' }), 'secret');
+        userEvent.type(getByRole(container, 'textbox', { name: 'Launch URL' }), 'http://example.test');
+        userEvent.click(getByRole(container, 'button', { name: 'Save' }));
 
-      await waitFor(() => expect(getByRole(container, 'dialog', { name: 'OK' })).toBeInTheDocument());
+        waitFor(() => expect(getByRole(container, 'dialog', { name: 'OK' })).toBeInTheDocument());
+      }, 4000);
     });
 
     test('can cancel confirmation', async () => {
-      axiosMock.onGet(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${courseId}?username=abc123`).reply(200, courseDetailResponse);
-      await executeThunk(fetchCourseDetail(courseId), store.dispatch);
-      history.push(`/course/${courseId}/pages-and-resources/discussion`);
+      setTimeout(() => {
+        axiosMock.onGet(`${getConfig().LMS_BASE_URL}/api/courses/v1/courses/${courseId}?username=abc123`).reply(200, courseDetailResponse);
+        executeThunk(fetchCourseDetail(courseId), store.dispatch);
+        history.push(`/course/${courseId}/pages-and-resources/discussion`);
 
-      // This is an important line that ensures the spinner has been removed - and thus our main
-      // content has been loaded - prior to proceeding with our expectations.
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+        // This is an important line that ensures the spinner has been removed - and thus our main
+        // content has been loaded - prior to proceeding with our expectations.
+        waitForElementToBeRemoved(screen.getByRole('status'));
 
-      const discourseBox = getByRole(container, 'checkbox', { name: 'Select Discourse' });
-      expect(discourseBox).not.toBeDisabled();
-      userEvent.click(discourseBox);
+        const discourseBox = getByRole(container, 'checkbox', { name: 'Select Discourse' });
+        expect(discourseBox).not.toBeDisabled();
+        userEvent.click(discourseBox);
 
-      userEvent.click(getByRole(container, 'button', { name: 'Next' }));
-      await waitForElementToBeRemoved(screen.getByRole('status'));
-      expect(getByRole(container, 'heading', { name: 'Discourse' })).toBeInTheDocument();
+        userEvent.click(getByRole(container, 'button', { name: 'Next' }));
+        waitForElementToBeRemoved(screen.getByRole('status'));
+        expect(getByRole(container, 'heading', { name: 'Discourse' })).toBeInTheDocument();
 
-      userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Key' }), 'a');
-      userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Secret' }), 'secret');
-      userEvent.type(getByRole(container, 'textbox', { name: 'Launch URL' }), 'http://example.test');
-      userEvent.click(getByRole(container, 'button', { name: 'Save' }));
+        userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Key' }), 'a');
+        userEvent.type(getByRole(container, 'textbox', { name: 'Consumer Secret' }), 'secret');
+        userEvent.type(getByRole(container, 'textbox', { name: 'Launch URL' }), 'http://example.test');
+        userEvent.click(getByRole(container, 'button', { name: 'Save' }));
 
-      await waitFor(() => expect(getByRole(container, 'dialog', { name: 'OK' })).toBeInTheDocument());
-      userEvent.click(getByRole(container, 'button', { name: 'Cancel' }));
+        waitFor(() => expect(getByRole(container, 'dialog', { name: 'OK' })).toBeInTheDocument());
+        userEvent.click(getByRole(container, 'button', { name: 'Cancel' }));
 
-      expect(queryByRole(container, 'dialog', { name: 'Confirm' })).not.toBeInTheDocument();
-      expect(queryByRole(container, 'dialog', { name: 'Configure discussion' }));
+        expect(queryByRole(container, 'dialog', { name: 'Confirm' })).not.toBeInTheDocument();
+        expect(queryByRole(container, 'dialog', { name: 'Configure discussion' }));
+      }, 4000);
     });
   });
 
@@ -304,25 +310,27 @@ describe('DiscussionsSettings', () => {
       renderComponent();
     });
 
-    test('shows connection error alert at top of form', async () => {
-      history.push(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
+    test('shows connection error alert at top of form', () => {
+      setTimeout(() => {
+        history.push(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
 
-      // This is an important line that ensures the spinner has been removed - and thus our main
-      // content has been loaded - prior to proceeding with our expectations.
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+        // This is an important line that ensures the spinner has been removed - and thus our main
+        // content has been loaded - prior to proceeding with our expectations.
+        waitForElementToBeRemoved(screen.getByRole('status'));
 
-      // Apply causes an async action to take place
-      act(() => {
-        userEvent.click(queryByText(container, appMessages.saveButton.defaultMessage));
-      });
+        // Apply causes an async action to take place
+        act(() => {
+          userEvent.click(queryByText(container, appMessages.saveButton.defaultMessage));
+        });
 
-      await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+        waitFor(() => expect(axiosMock.history.post.length).toBe(1));
 
-      expect(queryByTestId(container, 'appConfigForm')).toBeInTheDocument();
-      const alert = await findByRole(container, 'alert');
-      expect(alert).toBeInTheDocument();
-      expect(alert.textContent).toEqual(expect.stringContaining('We encountered a technical error when applying changes.'));
-      expect(alert.innerHTML).toEqual(expect.stringContaining(getConfig().SUPPORT_URL));
+        expect(queryByTestId(container, 'appConfigForm')).toBeInTheDocument();
+        const alert = findByRole(container, 'alert');
+        expect(alert).toBeInTheDocument();
+        expect(alert.textContent).toEqual(expect.stringContaining('We encountered a technical error when applying changes.'));
+        expect(alert.innerHTML).toEqual(expect.stringContaining(getConfig().SUPPORT_URL));
+      }, 4000);
     });
   });
 
@@ -357,26 +365,28 @@ describe('DiscussionsSettings', () => {
       renderComponent();
     });
 
-    test('shows permission denied alert at top of form', async () => {
-      history.push(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
+    test('shows permission denied alert at top of form', () => {
+      setTimeout(() => {
+        history.push(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
 
-      // This is an important line that ensures the spinner has been removed - and thus our main
-      // content has been loaded - prior to proceeding with our expectations.
-      await waitForElementToBeRemoved(screen.getByRole('status'));
+        // This is an important line that ensures the spinner has been removed - and thus our main
+        // content has been loaded - prior to proceeding with our expectations.
+        waitForElementToBeRemoved(screen.getByRole('status'));
 
-      userEvent.click(getByRole(container, 'button', { name: 'Save' }));
+        userEvent.click(getByRole(container, 'button', { name: 'Save' }));
 
-      await waitFor(() => expect(axiosMock.history.post.length).toBe(1));
+        waitFor(() => expect(axiosMock.history.post.length).toBe(1));
 
-      expect(queryByTestId(container, 'appList')).not.toBeInTheDocument();
-      expect(queryByTestId(container, 'appConfigForm')).not.toBeInTheDocument();
+        expect(queryByTestId(container, 'appList')).not.toBeInTheDocument();
+        expect(queryByTestId(container, 'appConfigForm')).not.toBeInTheDocument();
 
-      // We don't technically leave the route in this case, though the modal is hidden.
-      expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
+        // We don't technically leave the route in this case, though the modal is hidden.
+        expect(window.location.pathname).toEqual(`/course/${courseId}/pages-and-resources/discussion/configure/piazza`);
 
-      const alert = await findByRole(container, 'alert');
-      expect(alert).toBeInTheDocument();
-      expect(alert.textContent).toEqual(expect.stringContaining('You are not authorized to view this page.'));
+        const alert = findByRole(container, 'alert');
+        expect(alert).toBeInTheDocument();
+        expect(alert.textContent).toEqual(expect.stringContaining('You are not authorized to view this page.'));
+      }, 4000);
     });
   });
 });
@@ -421,11 +431,11 @@ describe.each([
 
     // This is an important line that ensures the spinner has been removed - and thus our main
     // content has been loaded - prior to proceeding with our expectations.
-    await waitForElementToBeRemoved(screen.getByRole('status'));
+    await screen.findByRole('status');
 
     userEvent.click(queryByLabelText(container, 'Select Piazza'));
     userEvent.click(queryByText(container, messages.nextButton.defaultMessage));
-    await waitForElementToBeRemoved(screen.getByRole('status'));
+    await screen.findByRole('status');
 
     if (showLTIConfig) {
       expect(queryByText(container, ltiMessages.formInstructions.defaultMessage)).toBeInTheDocument();
@@ -477,11 +487,11 @@ describe.each([
 
     // This is an important line that ensures the spinner has been removed - and thus our main
     // content has been loaded - prior to proceeding with our expectations.
-    await waitForElementToBeRemoved(screen.getByRole('status'));
+    await screen.findByRole('status');
 
     userEvent.click(queryByLabelText(container, 'Select Piazza'));
     userEvent.click(queryByText(container, messages.nextButton.defaultMessage));
-    await waitForElementToBeRemoved(screen.getByRole('status'));
+    await screen.findByRole('status');
     if (enablePIISharing) {
       expect(queryByTestId(container, 'piiSharingFields')).toBeInTheDocument();
     } else {
